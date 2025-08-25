@@ -1,4 +1,4 @@
- // Get the main image
+// Get the main image
 const mainImage = document.getElementById("mainImage");
 
 // Get all thumbnails
@@ -7,13 +7,25 @@ const thumbnails = document.querySelectorAll(".thumbnails img");
 // Add click events
 thumbnails.forEach(thumbnail => {
   thumbnail.addEventListener("click", () => {
-    // Change main image source
-    mainImage.src = thumbnail.src;
+    const newSrc = thumbnail.src;
 
-    // Remove "active" class from all thumbnails
-    thumbnails.forEach(img => img.classList.remove("active"));
+    // Create a temporary image to preload
+    const tempImg = new Image();
+    tempImg.src = newSrc;
 
-    // Add "active" class to clicked thumbnail
-    thumbnail.classList.add("active");
+    // Once loaded, swap the main image
+    tempImg.onload = () => {
+      mainImage.src = newSrc;
+
+      // Restart animation cleanly
+      mainImage.classList.remove("animate");
+      void mainImage.offsetWidth; // force reflow
+      mainImage.classList.add("animate");
+
+      // Highlight the selected thumbnail
+      thumbnails.forEach(img => img.classList.remove("active"));
+      thumbnail.classList.add("active");
+    };
   });
 });
+
